@@ -1,11 +1,10 @@
 <template>
   <div class="home">
-    <!--暂无找到Globe加载完成的回调,利用css层级关系 Globe加载完成覆盖掉Loading-->
     <Loading loadText="loading ..." :zIndex="0" />
     <div class="toggle-thermodynamic-chart" @click="toggleThermodynamicChart">{{thermodynamicChart ? $t('close_thermodynamic_chart') : $t('open_thermodynamic_chart')}}</div>
     <Globe 
       v-model="activeCountryCode" 
-      :countryPrice="countriesPriceMap"
+      :countryPrice="countriesPrice"
       :thermodynamicChart="thermodynamicChart"
     />
     <div :class="['country-detail', {'is-active': activeCountryCode}]">
@@ -26,20 +25,14 @@
           <option v-for="code in allCountriesCodes" :value="code" :key="code">{{getCountryName(code)}}</option>
         </b-select>
       </div>
-      <div class="country-content" v-if="activeCountryCode">
+      <div class="country-content" v-if="activeCountryCode && getLangItem(activeCountryCode)">
         <section class="section">
-          <section class="section content" v-if="activeCountryCode && landInfo[activeCountryCode]">
+          <section class="section content" v-if="activeCountryCode && getLangItem(activeCountryCode)">
             <h1 class="title">Sponsor</h1>
-            <p>This country is brought to you by @{{ landInfo[activeCountryCode].owner}}.</p>
-            <p><a @click="popupPaymentModal()">Pay {{ $API.getNextPrice(landInfo[activeCountryCode]) | price }} to be the new sponsor</a></p>
+            <p>This country is brought to you by @{{ getLangItem(activeCountryCode).owner}}.</p>
+            <p><a @click="popupPaymentModal(activeCountryCode)">Pay {{`${parseInt(getLangItem(activeCountryCode)._nextPrice._hex, 16) / 1000000} TRX`}} to be the new sponsor</a></p>
           </section>
           <h1 class="title">Meetups in <b> {{getCountryName(activeCountryCode)}} </b></h1>
-          <div v-if="activeCountryCode === 'CHN'">
-            <MeetupBox v-for="(item,key) in meetupList" :key="key" :data="item"></MeetupBox>
-          </div>
-          <template v-else>
-            <p>There is no meetup.</p>
-          </template>
         </section>
       </div>
     </div>
@@ -48,16 +41,14 @@
 
 <script>
 import * as CountryCode from 'i18n-iso-countries';
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import * as config from '@/config';
 import Land from '@/util/land';
 import Globe from '@/components/Globe.vue';
 import SponsorPaymentModal from '@/components/SponsorPaymentModal.vue';
 import MeetupBox from '@/components/MeetupBox.vue';
 import Loading from '@/components/Loading.vue';
-
-
-import tronApi from '@/util/tronApi'
+import tronApi from '@/util/tronApi';
 
 CountryCode.registerLocale(require('i18n-iso-countries/langs/en.json'));
 CountryCode.registerLocale(require('i18n-iso-countries/langs/zh.json'));
@@ -77,7 +68,7 @@ export default {
   data() {
     return {
       allCountriesCodes: Object.keys(CountryCode.getAlpha3Codes()),
-      countriesPriceMap: {},
+      countriesPrice: {},
       activeCountryCode: null,
       payByPhone: false,
       thermodynamicChart: false,
@@ -97,18 +88,20 @@ export default {
     };
   },
   async created() {
-    this.updateCountryPriceMap();
+    this.updateCountryPrice();
   },
   mounted() {
+    // this.getLangArr()
     this.$store.commit('ui/setLatestBuyerVisible', true);
   },
   beforeDestroy() {
     this.$store.commit('ui/setLatestBuyerVisible', false);
   },
   computed: {
-    ...mapState(['landInfo']),
+    ...mapState(['landArr']),
   },
   methods: {
+    ...mapActions(['getLangArr']),
     clearGlobeFocus() {
       this.activeCountryCode = null;
     },
@@ -123,43 +116,32 @@ export default {
       const locale = CountryCode.langs().includes(this.$i18n.locale) ? this.$i18n.locale : 'en';
       return CountryCode.getName(countryCode, locale);
     },
-    popupPaymentModal() {
-      const referrer = localStorage.getItem(config.referrerStorageKey);
-      const landId = Land.countryCodeToLandId(this.activeCountryCode);
-      const memo = ['buy_land', String(landId)];
-      if (referrer) {
-        memo.push(referrer);
-      }
+    popupPaymentModal(code) {
       this.$modal.open({
         parent: this,
         component: SponsorPaymentModal,
         hasModalCard: true,
         props: {
-          countryName: this.getCountryName(this.activeCountryCode),
-          transaction: {
-            to: 'cryptomeetup',
-            amount: this.$API.getNextPrice(this.landInfo[this.activeCountryCode]),
-            memo: memo.join(' '),
-          },
+          country: this.getLangItem(code),
+          countryName: this.getCountryName(this.activeCountryCode)
         },
       });
     },
-    updateCountryPriceMap(landInfo2) {
-      const landInfo = landInfo2 || this.landInfo;
+    updateCountryPrice (landArr2) {
+      const landArr = landArr2 || this.landArr2 || []
       const priceMap = {};
-      if (landInfo) {
-        Object
-          .values(landInfo)
-          .forEach((land) => {
-            priceMap[land.code] = land.price;
-          });
-      }
-      this.countriesPriceMap = priceMap;
+      landArr.forEach(item => {
+        priceMap[item.code] = parseInt(item._price._hex, 16)
+      })
+      this.countriesPrice = priceMap;
+    },
+    getLangItem (code) {
+      return this.landArr.find(item => item.code === code)
     },
   },
   watch: {
-    landInfo(landInfo) {
-      this.updateCountryPriceMap(landInfo);
+    landArr (landArr) {
+      this.updateCountryPrice(landArr)
     },
     activeCountryCode(code) {
       this.$store.commit('ui/setNavBurgerVisible', code === null);

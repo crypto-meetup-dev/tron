@@ -5,6 +5,8 @@ import Land from '@/util/land';
 import API, { currentEOSAccount } from '@/util/api';
 import ui from './ui';
 import Global from '@/Global.js';
+import tronApi from '@/util/tronApi';
+import countryPointsJson from '@/util/countryPoints.json';
 
 Vue.use(Vuex);
 
@@ -17,6 +19,7 @@ export default new Vuex.Store({
       installed: false,
       loggedIn: false
     },
+    landArr: [],
     isScatterConnected: false,
     scatterAccount: null,
     portalInfoList: [],
@@ -26,7 +29,6 @@ export default new Vuex.Store({
     },
     isScatterLoggingIn: false,
     isLoadingData: false,
-    landInfo: {},
     landInfoUpdateAt: null,
     marketInfo: {},
     stakedInfo: { staked: 0 },
@@ -45,8 +47,8 @@ export default new Vuex.Store({
     setTronWeb(state, tronWebInfo) {
       state.tronWeb = tronWebInfo;
     },
-    setLandInfo(state, landInfo) {
-      state.landInfo = landInfo;
+    setLandArr(state, landArr) {
+      state.landArr = landArr
       state.landInfoUpdateAt = new Date();
     },
     setMarketInfo(state, marketInfo) {
@@ -85,6 +87,24 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    getLangArr ({ commit }) {
+      let langArr = []
+      const promises = [...Array(150)].map((item, index) => {
+        try {
+          return tronApi.contract.allOf(index + 1).call()
+        } catch (err) {
+          console.log(err, 'err')
+        }
+      })
+
+      Promise.all(promises).then(resp => {
+        langArr = resp.map((item, index) => {
+          item.code = countryPointsJson[index].code
+          return item
+        })
+        commit('setLandArr', langArr);
+      })
+    },
     async connectScatterAsync({ commit, dispatch }) {
       console.log('Connecting to Scatter desktop...');
       const connected = await API.connectScatterAsync();
@@ -111,24 +131,6 @@ export default new Vuex.Store({
       const cmu = balances[1][0];
       commit('setMyBalance', { symbol: 'eos', balance: eos });
       commit('setMyBalance', { symbol: 'cmu', balance: cmu });
-    },
-    async updateLandInfoAsync({ commit }) {
-      commit('setIsLoadingData', true);
-      try {
-        const landInfo = {};
-        const rows = await API.getLandsInfoAsync();
-        rows.forEach((row) => {
-          const countryCode = Land.landIdToCountryCode(row.id);
-          landInfo[countryCode] = {
-            ...row,
-            code: countryCode,
-          };
-        });
-        commit('setLandInfo', landInfo);
-      } catch (err) {
-        console.error('Failed to fetch land info', err);
-      }
-      commit('setIsLoadingData', false);
     },
     async updateMarketInfoAsync({ commit }) {
       try {
