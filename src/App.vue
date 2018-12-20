@@ -24,7 +24,7 @@
       <div class="footer-item is-hidden-mobile">{{$t('powered_by')}} <a target="_blank" href="https://tron.network/index?lng=en">TronWeb</a></div>
       <div class="footer-item" v-if="nowGlobal">{{$t('count_down')}}: <b>{{ globalCountdown }}</b> </div>
       <div class="footer-item" v-if="nowGlobal">
-        {{$t('prize_pool')}}: <b>{{`${parseInt(nowGlobal._pool._hex, 16)} TRX`}}</b>
+        {{$t('prize_pool')}}: <b>{{`${parseInt(nowGlobal._pool._hex, 16) / 1000000} TRX`}}</b>
       </div>
       <div class="footer-item is-hidden-mobile">
         <b-select class="is-inverted" v-model="$i18n.locale" :placeholder="$t('switch_lang')" size="is-small" rounded>
@@ -38,7 +38,7 @@
       </div>
     </div>
     <div class="app-footer last-buyer">
-      <div class="footer-item" v-if="nowGlobal">{{$t('last_buyer')}}: <b>{{ nowGlobal._lastone }}</b> </div>
+      <div class="footer-item" v-if="nowGlobal">{{$t('last_buyer')}}: <b>{{ getBase58CheckAddress(nowGlobal._lastone) }}</b> </div>
     </div>
     <a
       :class="['app-nav-burger', 'is-hidden-tablet', { 'is-active': mobileNavExpanded }]"
@@ -140,6 +140,9 @@ export default {
     ...mapActions(['getLangArr', 'getNowGlobal']),
     CloseAboutView() {
       this.aboutShow = !this.aboutShow;
+    },
+    getBase58CheckAddress (add) {
+      return window.tronWeb.address.fromHex(add)
     },
     CloseTokenView() {
       this.tokenShow = !this.tokenShow;

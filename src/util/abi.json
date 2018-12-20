@@ -1,6 +1,6 @@
 {
   "Crtyptomeetup": {
-    "address": "41e142d2f2e2037dcc0ee7d14e82f1be8ec8dbe86c",
+    "address": "413d98cf7e5a5e5a8fe464732fe58cbb3f0428dfa0",
     "abi": [
       {
         "constant": true,
@@ -724,6 +724,15 @@
       },
       {
         "constant": false,
+        "inputs": [],
+        "name": "initGlobal",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "constant": false,
         "inputs": [
           {
             "name": "l",
@@ -939,6 +948,25 @@
             "type": "uint256"
           }
         ],
+        "name": "getGlobalDevCut",
+        "outputs": [
+          {
+            "name": "_devCut",
+            "type": "uint256"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [
+          {
+            "name": "index",
+            "type": "uint256"
+          }
+        ],
         "name": "getGlobal",
         "outputs": [
           {
@@ -955,6 +983,10 @@
           },
           {
             "name": "_pool",
+            "type": "uint256"
+          },
+          {
+            "name": "_devCut",
             "type": "uint256"
           }
         ],
@@ -981,6 +1013,10 @@
           },
           {
             "name": "_pool",
+            "type": "uint256"
+          },
+          {
+            "name": "_devCut",
             "type": "uint256"
           }
         ],
@@ -1047,4 +1083,4 @@
       }
     ]
   }
-}
+} 
