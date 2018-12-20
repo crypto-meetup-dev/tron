@@ -34,7 +34,7 @@ export default new Vuex.Store({
   },
   actions: {
     getLangArr ({ commit }) {
-      const promises = [...Array(30)].map((item, index) => {
+      const promises = [...Array(40)].map((item, index) => {
         try {
           return tronApi.contract.allOf(index + 1).call()
         } catch (err) {
@@ -43,6 +43,7 @@ export default new Vuex.Store({
       })
       try {
         Promise.all(promises).then(resp => {
+          console.log(resp)
           commit('setLandArr', resp.map((item, index) => {
             item.code = countryPointsJson[index].code
             item.id = index + 1
