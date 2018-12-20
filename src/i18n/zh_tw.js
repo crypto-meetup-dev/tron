@@ -57,7 +57,7 @@ export default {
   ok: '好的',
   sell_cmu_success_alert: 'CMU 成功賣出',
   after_sell_cmu_alert: '稍後留意 EOS 余額變動',
-  scatter_login_fail: 'Scatter 登入失敗：用戶的 Scatter 錢包已被鎖定，在進行下壹步之前用戶已經被通知',
+  scatter_login_fail: 'TronPay 登入失敗：用戶的 TronPay 錢包已被鎖定，在進行下壹步之前用戶已經被通知',
   scatter_login_success: '成功使用Scatter錢包登錄',
 
   buy_land_withApp_success: '轉賬成功，30 秒內自動刷新數據，即可確認妳是否為新地主。壹切以區塊鏈上交易記錄為準，購買地皮失敗則退款。',

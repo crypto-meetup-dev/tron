@@ -11,12 +11,12 @@
       </div>
       <div class="columns">
         <div class="column content is-hidden-mobile">
-          <h4>Pay with Scatter Desktop</h4>
-          <p>Scatter Desktop allows convenient transactions securely.</p>
+          <h4>Pay with TronPay Desktop</h4>
+          <p>TronPay Desktop allows convenient transactions securely.</p>
           <button :class="['button', 'is-white', 'is-rounded', 'is-outlined', { 'is-loading': isScatterPaying }]"
             @click="payWithScatterAsync"
           >
-            Pay with Scatter
+            Pay with TronPay
           </button>
         </div>
         <div class="column content is-hidden-tablet">
@@ -30,7 +30,6 @@
       </div>
     </section>
     <footer class="modal-card-foot">
-      <button class="button is-rounded is-hidden-mobile is-primary" @click="paidWithWalletApp()">I have paid with Wallet Apps</button>
       <button class="button is-rounded is-white is-outlined" type="button" @click="$parent.close()">Close</button>
     </footer>
   </div>
@@ -52,7 +51,7 @@ export default {
     isScatterPaying: false,
   }),
   methods: {
-    ...mapActions(['getLangArr']),
+    ...mapActions(['getLangArr', 'getNowGlobal']),
     paidWithWalletApp() {
       this.getLangArr();
       this.$toast.open({
@@ -66,11 +65,11 @@ export default {
     async payWithScatterAsync() {
       this.isScatterPaying = true;
       try {
-        tronApi.contract.buy(1).send({
+        tronApi.contract.buy(this.country.id).send({
           shouldPollResponse: true,
-          callValue: 1048576,
+          callValue: parseInt(this.country._nextPrice._hex, 16) + 100,
         }).then(resp => {
-          console.log(resp, 'resp')
+          this.getNowGlobal();
           this.getLangArr();
           this.$dialog.alert({
             type: 'is-black',

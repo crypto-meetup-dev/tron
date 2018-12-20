@@ -64,11 +64,7 @@
         <div class="app-nav-expand-item" @click.stop>
           <b-select class="is-inverted" v-model="$i18n.locale" icon="translate" :placeholder="$t('switch_lang')" size="is-small" rounded expanded>
             <option value="en">English</option>
-            <option value="ja">日本語</option>
-            <option value="ko">한국어</option>
-            <option value="ru">русский</option>
             <option value="zh">简体中文</option>
-            <option value="zh_tw">繁體中文</option>
           </b-select>
         </div>
       </div>
@@ -106,12 +102,36 @@ export default {
   }),
   async created() {
     tronApi.setTronWeb(window.tronWeb)
+    if (window.tronWeb.ready) {
+      this.getNowGlobal()
+      this.getLangArr()
+    } else {
+      this.$toast.open({
+        message: this.$t('scatter_login_fail'),
+        type: 'is-danger',
+        duration: 3000,
+        queue: false,
+      })
+      this.tronWebReady = setInterval(() => {
+        if (window.tronWeb.ready) {
+          clearInterval(this.tronWebReady)
+          this.getNowGlobal()
+          this.getLangArr()
+          // 提示用户刷新
+          this.$toast.open({
+            message: this.$t('tronpay_login_success'),
+            type: 'is-danger',
+            duration: 3000,
+            queue: false,
+          })
+        }
+      }, 1000);
+    }
 
     this.countdownUpdater = setInterval(() => {
       if (this.nowGlobal != null) {
         clearInterval(this.countdownUpdater)
-        console.log(123456678)
-        this.times = (parseInt(this.nowGlobal._end._hex, 16) - parseInt(this.nowGlobal._begin._hex, 16)) * 1000
+        this.times = parseInt(this.nowGlobal._end._hex, 16) * 1000 - Date.now()
         this.countdown()
       }
     }, 1000);
@@ -166,9 +186,6 @@ export default {
   computed: {
     ...mapState(['nowGlobal']),
     ...mapState('ui', ['navBurgerVisible', 'globalProgressVisible']),
-  },
-  mounted() {
-    this.getNowGlobal()
   },
   beforeDestroy () {
     Global.$off('onLoadMap')

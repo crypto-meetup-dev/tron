@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { Toast } from 'buefy/dist/components/toast';
-import Land from '@/util/land';
+// import { Toast } from 'buefy/dist/components/toast';
+// import Land from '@/util/land';
+import countryPointsJson from '@/util/countryPoints.json';
 import ui from './ui';
 import tronApi from '@/util/tronApi';
 
@@ -28,7 +29,6 @@ export default new Vuex.Store({
       state.landInfoUpdateAt = new Date();
     },
     setNowGlobal(state, nowGlobal) {
-      console.log(nowGlobal, 'nowGlobal')
       state.nowGlobal = nowGlobal
     },
   },
@@ -41,15 +41,26 @@ export default new Vuex.Store({
           console.log(err, 'err')
         }
       })
-
-      Promise.all(promises).then(resp => {
-        commit('setLandArr', resp);
-      })
+      try {
+        Promise.all(promises).then(resp => {
+          commit('setLandArr', resp.map((item, index) => {
+            item.code = countryPointsJson[index].code
+            item.id = index + 1
+            return item
+          }));
+        })
+      } catch (err) {
+        console.log(err, 'err')
+      }
     },
     getNowGlobal ({commit}) {
-      tronApi.contract.getNowGlobal().call().then(resp => {
-        commit('setNowGlobal', resp);
-      })
+      try {
+        tronApi.contract.getNowGlobal().call().then(resp => {
+          commit('setNowGlobal', resp);
+        })
+      } catch (err) {
+        console.log(err, 'err')
+      }
     },
   },
 });
