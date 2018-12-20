@@ -91,7 +91,7 @@ export default {
     this.updateCountryPrice();
   },
   mounted() {
-    // this.getLangArr()
+    this.getLangArr()
     this.$store.commit('ui/setLatestBuyerVisible', true);
   },
   beforeDestroy() {

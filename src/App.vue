@@ -21,11 +21,10 @@
       <div class="footer-item is-hidden-mobile"><a target="_blank" href="https://www.reddit.com/user/cryptomeetup"><b-icon icon="reddit" size="is-small" /></a></div>
       <div class="footer-item is-hidden-mobile"><a target="_blank" href="https://github.com/crypto-meetup-dev"><b-icon icon="github-circle" size="is-small" /></a></div>
       <div class="footer-item is-hidden-mobile">{{$t('cmu_creator')}}</div>
-      <div class="footer-item is-hidden-mobile">{{$t('powered_by')}} <a target="_blank" href="https://eos.io/">EOSIO</a></div>
-      <div class="footer-item" v-if="globalInfo">{{$t('last_buyer')}}: <b>{{ globalInfo.last }}</b> </div>
-      <div class="footer-item" v-if="globalInfo">{{$t('count_down')}}: <b>{{ globalCountdown }}</b> </div>
-      <div class="footer-item" v-if="globalInfo">
-        {{$t('prize_pool')}}: <b>{{ globalInfo.pool | price('CMU') }}</b>
+      <div class="footer-item is-hidden-mobile">{{$t('powered_by')}} <a target="_blank" href="https://tron.network/index?lng=en">TronWeb</a></div>
+      <div class="footer-item" v-if="nowGlobal">{{$t('count_down')}}: <b>{{ globalCountdown }}</b> </div>
+      <div class="footer-item" v-if="nowGlobal">
+        {{$t('prize_pool')}}: <b>{{`${parseInt(nowGlobal._pool._hex, 16)} TRX`}}</b>
       </div>
       <div class="footer-item is-hidden-mobile">
         <b-select class="is-inverted" v-model="$i18n.locale" :placeholder="$t('switch_lang')" size="is-small" rounded>
@@ -37,6 +36,9 @@
           <option value="zh_tw">繁體中文</option>
         </b-select>
       </div>
+    </div>
+    <div class="app-footer last-buyer">
+      <div class="footer-item" v-if="nowGlobal">{{$t('last_buyer')}}: <b>{{ nowGlobal._lastone }}</b> </div>
     </div>
     <a
       :class="['app-nav-burger', 'is-hidden-tablet', { 'is-active': mobileNavExpanded }]"
@@ -79,10 +81,7 @@
 import { mapActions, mapState } from 'vuex';
 import Global from './Global.js';
 import Aboutview from '@/views/About.vue';
-import Tokenview from '@/views/Token.vue';
-import API, { eos } from '@/util/api';
 import Loading from '@/components/Loading.vue';
-import InviteModal from '@/components/InviteModal.vue';
 import TronWeb from 'tronweb';
 import tronApi from '@/util/tronApi';
 
@@ -91,8 +90,6 @@ export default {
   components: {
     Loading,
     Aboutview,
-    Tokenview,
-    InviteModal,
   },
   data: () => ({
     mobileNavExpanded: false,
@@ -108,26 +105,19 @@ export default {
     portalList: []
   }),
   async created() {
-    tronApi.setTronWeb(window.tronWeb)  
+    tronApi.setTronWeb(window.tronWeb)
+
     this.countdownUpdater = setInterval(() => {
-      if (this.globalInfo != null) {
-        const currentTimestamp = Math.floor(Date.now() / 1000);
-        if (currentTimestamp >= this.globalInfo.ed) {
-          this.globalCountdown = 'ENDED';
-        } else {
-          let remaining = this.globalInfo.ed - currentTimestamp;
-          const seconds = `${remaining % 60}`;
-          remaining = Math.floor(remaining / 60);
-          const minutes = `${remaining % 60}`;
-          remaining = Math.floor(remaining / 60);
-          const hours = `${remaining}`;
-          this.globalCountdown = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
-        }
+      if (this.nowGlobal != null) {
+        clearInterval(this.countdownUpdater)
+        console.log(123456678)
+        this.times = (parseInt(this.nowGlobal._end._hex, 16) - parseInt(this.nowGlobal._begin._hex, 16)) * 1000
+        this.countdown()
       }
     }, 1000);
   },
   methods: {
-    ...mapActions(['getLangArr', 'getGlobalInfo']),
+    ...mapActions(['getLangArr', 'getNowGlobal']),
     CloseAboutView() {
       this.aboutShow = !this.aboutShow;
     },
@@ -142,14 +132,43 @@ export default {
     },
     changeInviteStatus() {
       this.isInviteDialogActive = true;
+    },
+    countdown (cb) {
+      this.timmer = setInterval(() => {
+        this.times = this.times - 1000
+        if (this.times <= 0) {
+          clearInterval(this.timmer)
+          this.globalCountdown = '00:00:00'
+          cb && cb()
+        } else {
+          this.changeTime(this.times)
+        }
+      }, 1000)
+    },
+    changeTime (time) {
+      let days = Math.floor(time / (24 * 3600 * 1000))
+      let leave1 = time % (24 * 3600 * 1000)
+      let hours = Math.floor(leave1 / (3600 * 1000))
+      let leave2 = leave1 % (3600 * 1000)
+      let minutes = Math.floor(leave2 / (60 * 1000))
+      let leave3 = leave2 % (60 * 1000)
+      let seconds = Math.round(leave3 / 1000)
+      let htime = (days * 24) + hours
+      this.globalCountdown = `${this.checkTime(hours)}:${this.checkTime(minutes)}:${this.checkTime(seconds)}`
+    },
+    checkTime (i) {
+      if (i < 10) {
+        i = `0${i}`
+      }
+      return i
     }
   },
   computed: {
-    ...mapState(['landInfoUpdateAt', 'globalInfo']),
+    ...mapState(['nowGlobal']),
     ...mapState('ui', ['navBurgerVisible', 'globalProgressVisible']),
   },
   mounted() {
-    this.getGlobalInfo();
+    this.getNowGlobal()
   },
   beforeDestroy () {
     Global.$off('onLoadMap')
@@ -217,6 +236,8 @@ a:hover
   text-shadow: 1px 1px 2px rgba(#000, 0.5)
   a:hover
     text-decoration: none
+.last-buyer
+  bottom: 4rem
 .footer-item
   margin: 0 0.5rem
   font-size: $size-7
