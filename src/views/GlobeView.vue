@@ -30,7 +30,7 @@
           <section class="section content" v-if="activeCountryCode && getLangItem(activeCountryCode)">
             <h1 class="title">Sponsor</h1>
             <p>This country is brought to you by @{{ getLangItem(activeCountryCode).owner}}.</p>
-            <p><a @click="popupPaymentModal(activeCountryCode)">Pay {{`${parseInt(getLangItem(activeCountryCode)._nextPrice._hex, 16) / 1000000} TRX`}} to be the new sponsor</a></p>
+            <p><a @click="popupPaymentModal(activeCountryCode)">Pay {{`${parseInt(getLangItem(activeCountryCode)._price._hex, 16) / 1000000} TRX`}} to be the new sponsor</a></p>
           </section>
           <h1 class="title">Meetups in <b> {{getCountryName(activeCountryCode)}} </b></h1>
         </section>
@@ -116,6 +116,7 @@ export default {
       return CountryCode.getName(countryCode, locale);
     },
     popupPaymentModal(code) {
+      console.log(code, this.getLangItem(code), this.getCountryName(this.activeCountryCode))
       this.$modal.open({
         parent: this,
         component: SponsorPaymentModal,

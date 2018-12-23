@@ -6,7 +6,7 @@
     <section class="modal-card-body">
       <div class="columns">
         <div class="column">
-          <p>To become the new sponsor of {{ countryName }}, you need to pay <strong>{{ `${parseInt(country._nextPrice._hex, 16) / 1000000} TRX` }}</strong>.</p>
+          <p>To become the new sponsor of {{ countryName }}, you need to pay <strong>{{ `${parseInt(country._price._hex, 16) / 1000000} TRX` }}</strong>.</p>
         </div>
       </div>
       <div class="columns">

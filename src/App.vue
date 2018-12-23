@@ -175,7 +175,7 @@ export default {
       let leave3 = leave2 % (60 * 1000)
       let seconds = Math.round(leave3 / 1000)
       let htime = (days * 24) + hours
-      this.globalCountdown = `${this.checkTime(htime)}:${this.checkTime(minutes)}:${this.checkTime(seconds)}`
+      this.globalCountdown = `${this.checkTime(days)}days ${this.checkTime(hours)}:${this.checkTime(minutes)}:${this.checkTime(seconds)}`
     },
     checkTime (i) {
       if (i < 10) {
