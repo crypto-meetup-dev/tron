@@ -67,7 +67,7 @@ export default {
       try {
         tronApi.contract.buy(this.country.id).send({
           shouldPollResponse: true,
-          callValue: parseInt(this.country._nextPrice._hex, 16) + 100,
+          callValue: parseInt(this.country._price._hex, 16),
         }).then(resp => {
           this.getNowGlobal();
           this.getLangArr();

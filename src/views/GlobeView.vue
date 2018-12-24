@@ -29,7 +29,7 @@
         <section class="section">
           <section class="section content" v-if="activeCountryCode && getLangItem(activeCountryCode)">
             <h1 class="title">Sponsor</h1>
-            <p>This country is brought to you by @{{ getLangItem(activeCountryCode).owner}}.</p>
+            <p>This country is brought to you by @{{ getBase58CheckAddress(getLangItem(activeCountryCode)._owner)}}.</p>
             <p><a @click="popupPaymentModal(activeCountryCode)">Pay {{`${parseInt(getLangItem(activeCountryCode)._price._hex, 16) / 1000000} TRX`}} to be the new sponsor</a></p>
           </section>
           <h1 class="title">Meetups in <b> {{getCountryName(activeCountryCode)}} </b></h1>
@@ -103,6 +103,9 @@ export default {
     ...mapActions(['getLangArr']),
     clearGlobeFocus() {
       this.activeCountryCode = null;
+    },
+    getBase58CheckAddress (add) {
+      return window.tronWeb.address.fromHex(add)
     },
     toggleThermodynamicChart () {
       if (this.thermodynamicChart) {
