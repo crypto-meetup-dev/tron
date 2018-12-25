@@ -39,12 +39,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import SimpleWallet from '@/libs/SimpleWallet';
-import API from '@/util/api';
 import tronApi from '@/util/tronApi';
-// import QrCode from '@xkeshi/vue-qrcode';
-
-const walletHelper = new SimpleWallet('Crypto Meetups');
 
 export default {
   name: 'SponsorPaymentModal',
@@ -54,52 +49,35 @@ export default {
   }),
   methods: {
     ...mapActions(['getLangArr', 'getNowGlobal']),
-    paidWithWalletApp() {
-      this.getLangArr();
-      this.$toast.open({
-        message: this.$t('buy_land_withApp_success'),
-        type: 'is-black',
-        duration: 5000,
-        queue: false,
-      });
-      this.$parent.close();
-    },
     payWithScatterAsync() {
       this.isScatterPaying = true;
-      console.log(this.isScatterPaying, 'isScatterPaying')
-      try {
+      console.log(this.isScatterPaying, this._data.isScatterPaying)
+      // try {
         tronApi.contract.buy(this.country.id).send({
           shouldPollResponse: true,
           callValue: parseInt(this.country._price._hex, 16),
         }).then(resp => {
           this.getNowGlobal();
           this.getLangArr();
-          this.$toast.open({
-            message: this.$t('buy_land_success_alert'),
-            type: 'success',
-            duration: 3000,
-            queue: false,
-          });
           this.$parent.close();
           this.isScatterPaying = false;
-          return true;
         })
-      } catch (error) {
-        let msg;
-        if (error.message === undefined) {
-          msg = JSON.parse(error).error.details[0].message;
-        } else {
-          msg = error.message;
-        }
-        this.$toast.open({
-          message: `Transfer failed: ${msg}`,
-          type: 'is-danger',
-          duration: 3000,
-          queue: false,
-        });
-      }
-      this.isScatterPaying = false;
-      return null;
+      // } catch (error) {
+      //   let msg;
+      //   if (error.message === undefined) {
+      //     msg = JSON.parse(error).error.details[0].message;
+      //   } else {
+      //     msg = error.message;
+      //   }
+      //   this.$toast.open({
+      //     message: `Transfer failed: ${msg}`,
+      //     type: 'is-danger',
+      //     duration: 3000,
+      //     queue: false,
+      //   });
+      // }
+      // this.isScatterPaying = false;
+      // return null;
     },
   },
 };
