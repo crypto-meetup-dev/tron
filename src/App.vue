@@ -1,10 +1,26 @@
 <template>
   <div id="app">
+    <div class="mylangd" v-if="isShowMylangd">
+      <div class="close-mylangd" @click="closeMylangd"><img src="./assets/icons/close.png" /></div>
+      <div 
+        v-if="myLangdArr.length" 
+        v-for="(item, index) in myLangdArr" 
+        :key="index" 
+        class="mylangd-item"
+      >
+        <p>{{$t('my_portal_name')}}: {{getCountryName(item.code)}}</p>
+        <p>{{$t('my_portal_price')}}: {{`${parseInt(item._price._hex, 16) / 1000000} TRX`}}</p>
+      </div>
+      <div v-if="!myLangdArr.length" class="no-langd">
+        {{$t('my_portal_no_time')}}
+      </div>
+    </div>
     <div class="app-nav is-hidden-mobile">
       <b-modal :active.sync="isInviteDialogActive" has-modal-card>
         <invite-modal></invite-modal>
       </b-modal>
       <a class="nav-item" @click="aboutShow=!aboutShow">{{$t('about_view')}}</a>
+      <a class="nav-item" @click="toogleLangd">{{$t('land_view')}}</a>
     </div>
     <Aboutview
       :aboutShow="aboutShow"
@@ -49,6 +65,8 @@
       <div class="app-nav-expand is-hidden-tablet" v-show="navBurgerVisible && mobileNavExpanded" @click="mobileNavExpanded=false"><!-- Nav Items on mobile -->
         <a class="app-nav-expand-item" @click="mobileAboutShow=!mobileAboutShow;"><b-icon class="question-icon" pack="fas" icon="question-circle" size="is-small"></b-icon>
 {{' '+$t('about_view')}}</a>
+        <a class="app-nav-expand-item" @click="toogleLangd;"><b-icon class="question-icon" pack="fas" icon="question-circle" size="is-small"></b-icon>
+{{' '+$t('land_view')}}</a>
         <a class="app-nav-expand-item" target="_blank" href="https://twitter.com/EOSCryptomeetup"><b-icon icon="twitter" size="is-small" /> Twitter</a>
         <a class="app-nav-expand-item" target="_blank" href="https://t.me/Cryptomeetup_Official"><b-icon icon="telegram" size="is-small" /> Telegram</a>
         <a class="app-nav-expand-item" target="_blank" href="https://discordapp.com/invite/Ws3ENJf"><b-icon icon="discord" size="is-small" /> Discord</a>
@@ -74,6 +92,9 @@ import Aboutview from '@/views/About.vue';
 import Loading from '@/components/Loading.vue';
 import TronWeb from 'tronweb';
 import tronApi from '@/util/tronApi';
+import * as CountryCode from 'i18n-iso-countries';
+CountryCode.registerLocale(require('i18n-iso-countries/langs/en.json'));
+CountryCode.registerLocale(require('i18n-iso-countries/langs/zh.json'));
 
 export default {
   name: 'App',
@@ -84,6 +105,8 @@ export default {
   data: () => ({
     mobileNavExpanded: false,
     tokenShow: false,
+    aboutMylangd: false,
+    isShowMylangd: false,
     aboutShow: false,
     globalCountdown: '00:00:00',
     mobileTokenShow: false,
@@ -92,7 +115,8 @@ export default {
     isInviteDialogActive : false,
     appLogin: false,
     portalShow: false,
-    portalList: []
+    portalList: [],
+    myLangdArr: []
   }),
   async created() {
     tronApi.setTronWeb(window.tronWeb)
@@ -134,6 +158,10 @@ export default {
     ...mapActions(['getLangArr', 'getNowGlobal']),
     CloseAboutView() {
       this.aboutShow = !this.aboutShow;
+    },
+    getCountryName(countryCode) {
+      const locale = CountryCode.langs().includes(this.$i18n.locale) ? this.$i18n.locale : 'en';
+      return CountryCode.getName(countryCode, locale);
     },
     getBase58CheckAddress (add) {
       return window.tronWeb.address.fromHex(add)
@@ -178,10 +206,30 @@ export default {
         i = `0${i}`
       }
       return i
+    },
+    getMylang (landArr) {
+      if (tronWeb.defaultAddress && tronWeb.defaultAddress.hex && landArr.length) {
+        this.myLangdArr = landArr.filter(item => item._owner === tronWeb.defaultAddress.hex)
+      }
+    },
+    toogleLangd () {
+      if (this.isShowMylangd) {
+        this.isShowMylangd = false
+      } else {
+        this.isShowMylangd = true
+      }
+    },
+    closeMylangd () {
+      this.isShowMylangd = false
+    }
+  },
+  watch: {
+    landArr (landArr) {
+      this.getMylang(landArr)
     }
   },
   computed: {
-    ...mapState(['nowGlobal']),
+    ...mapState(['nowGlobal', 'landArr']),
     ...mapState('ui', ['navBurgerVisible', 'globalProgressVisible']),
   },
   beforeDestroy () {
@@ -213,6 +261,42 @@ a:hover
 </style>
 
 <style lang="sass" scoped>
+.mylangd 
+  position: absolute
+  left: 20px
+  top: 100px
+  bottom: 100px
+  right: 20px
+  z-index: 999
+  background: rgb(25, 25, 25)
+  overflow-y: scroll
+  padding-top: 20px
+
+.no-langd
+  text-align: center
+  font-size: 12px
+  padding: 50px 0
+  color: #fff
+
+.mylangd-item
+  font-size: 12px
+  color: #fff
+  padding-left: 20px
+  margin-bottom: 20px
+
+.close-mylangd
+  position: absolute
+  right: 20px
+  top: 20px
+  cursor: pointer
+  width: 24px
+  height: 24px
+
+  img
+    display: block
+    width: 24px
+    height: 24px
+
 #app
   position: absolute
   left: 0

@@ -43,6 +43,7 @@
 import * as CountryCode from 'i18n-iso-countries';
 import { mapState, mapActions } from 'vuex';
 import * as config from '@/config';
+import Global from '@/Global'
 import Land from '@/util/land';
 import Globe from '@/components/Globe.vue';
 import SponsorPaymentModal from '@/components/SponsorPaymentModal.vue';
@@ -104,6 +105,11 @@ export default {
     clearGlobeFocus() {
       this.activeCountryCode = null;
     },
+    getMyLangd (landArr) {
+      if (tronWeb.defaultAddress && tronWeb.defaultAddress.hex && landArr.length) {
+        Global.setGlobalLangd(landArr.filter(item => item._owner === tronWeb.defaultAddress.hex))
+      }
+    },
     getBase58CheckAddress (add) {
       return window.tronWeb.address.fromHex(add)
     },
@@ -145,6 +151,7 @@ export default {
   watch: {
     landArr (landArr) {
       this.updateCountryPrice(landArr)
+      this.getMyLangd(landArr)
     },
     activeCountryCode(code) {
       this.$store.commit('ui/setNavBurgerVisible', code === null);

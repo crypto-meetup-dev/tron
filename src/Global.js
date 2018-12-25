@@ -7,10 +7,16 @@ const globalPortal = {
   portalInfoList: [],
 }
 
+// 关于地球用的数据
+const globalLangd = {
+  myLangd: []
+}
+
 export default new Vue({
   data () {
     return {
-      ...globalPortal
+      ...globalPortal,
+      ...globalLangd,
     }
   },
   methods: {
@@ -19,6 +25,9 @@ export default new Vue({
     },
     setPortalInfoList(portalInfoList) {
       this.portalInfoList = portalInfoList
+    },
+    setGlobalLangd(myLangd) {
+      this.myLangd = myLangd
     }
   },
   beforeDestroy() {

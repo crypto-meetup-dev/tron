@@ -129,5 +129,7 @@ export default {
   tron_country: '该国家由您向 {user account}购买',
   tron_price: '支付 {price}成为新的赞助者',
   tron_name: '{countryName}活动',
-  tron_close: '关闭'
+  tron_close: '关闭',
+
+  land_view: '我的国家'
 };

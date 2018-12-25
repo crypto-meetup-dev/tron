@@ -128,5 +128,7 @@ export default {
   tron_country: 'This country is brought to you by {user account}',
   tron_price: 'Pay {price} to be the new sponsor',
   tron_name: 'Meetups in {countryName}',
-  tron_close: 'close'
+  tron_close: 'close',
+
+  land_view: 'My country'
 };
