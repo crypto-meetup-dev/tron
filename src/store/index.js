@@ -39,6 +39,7 @@ export default new Vuex.Store({
           return tronApi.contract.allOf(index + 1).call()
         } catch (err) {
           console.log(err, 'err')
+          alert('contract data error')
         }
       })
       try {
@@ -51,6 +52,7 @@ export default new Vuex.Store({
         })
       } catch (err) {
         console.log(err, 'err')
+        alert('contract data error')
       }
     },
     getNowGlobal ({commit}) {
