@@ -116,4 +116,18 @@ export default {
 
   my_portal_creator: '地标创建者',
   my_portal_owner: '地标拥有者',
+
+
+  tron_have_name: '赞助者 {countryName}',
+  tron_buy_text: '成为新的 {countryName}赞助者, 您需要支付 {price}',
+  tron_desktop: '使用TronPay桌面版进行支付',
+  tron_desktop_text: 'TronPay桌面版使支付更加便利、安全',
+  tron_tronpay: '使用TronPay进行支付',
+  tron_wallet_app: '使用钱包App兑付',
+  tron_app: '使用App兑付',
+  tron_have: '赞助者',
+  tron_country: '该国家由您向 {user account}购买',
+  tron_price: '支付 {price}成为新的赞助者',
+  tron_name: '{countryName}活动',
+  tron_close: '关闭'
 };

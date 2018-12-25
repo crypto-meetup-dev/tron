@@ -115,4 +115,18 @@ export default {
 
   my_portal_creator: 'portal creator',
   my_portal_owner: 'portal owner',
+
+
+  tron_have_name: 'Sponsor {countryName}',
+  tron_buy_text: 'To become the new sponsor of {countryName}, you need to pay {price}',
+  tron_desktop: 'Pay with TronPay Desktop',
+  tron_desktop_text: 'TronPay Desktop allows convenient transactions securely',
+  tron_tronpay: 'Pay with TronPay',
+  tron_wallet_app: 'Pay with Wallet Apps',
+  tron_app: 'Pay in Apps',
+  tron_have: 'Sponsor',
+  tron_country: 'This country is brought to you by {user account}',
+  tron_price: 'Pay {price} to be the new sponsor',
+  tron_name: 'Meetups in {countryName}',
+  tron_close: 'close'
 };

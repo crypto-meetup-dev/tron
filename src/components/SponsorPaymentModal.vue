@@ -1,36 +1,38 @@
 <template>
   <div class="modal-card autowidth">
     <header class="modal-card-head">
-      <p class="modal-card-title">Sponsor {{ countryName }}</p>
+      <p class="modal-card-title">{{$t('tron_have_name').replace('{countryName}', countryName)}}</p>
     </header>
     <section class="modal-card-body">
       <div class="columns">
         <div class="column">
-          <p>To become the new sponsor of {{ countryName }}, you need to pay <strong>{{ `${parseInt(country._price._hex, 16) / 1000000} TRX` }}</strong>.</p>
+          <p>{{$t('tron_buy_text').replace('{countryName}', countryName).replace('{price}', `${parseInt(country._price._hex, 16) / 1000000} TRX`)}}</p>
         </div>
       </div>
       <div class="columns">
         <div class="column content is-hidden-mobile">
-          <h4>Pay with TronPay Desktop</h4>
-          <p>TronPay Desktop allows convenient transactions securely.</p>
-          <button :class="['button', 'is-white', 'is-rounded', 'is-outlined', { 'is-loading': isScatterPaying }]"
+          <h4>{{$t('tron_desktop')}}</h4>
+          <p>{{$t('tron_desktop_text')}}</p>
+          <button
+            :class="[isScatterPaying ? 'button is-white is-rounded is-outlined is-loading' : 'button is-white is-rounded is-outlined']"
             @click="payWithScatterAsync"
           >
-            Pay with TronPay
+            {{$t('tron_tronpay')}}
           </button>
         </div>
         <div class="column content is-hidden-tablet">
-          <h4>Pay with Wallet Apps</h4>
-          <button :class="['button', 'is-white', 'is-rounded', 'is-outlined', { 'is-loading': isScatterPaying }]"
+          <h4>{{$t('tron_wallet_app')}}</h4>
+          <button
+            :class="[isScatterPaying ? 'button is-white is-rounded is-outlined is-loading' : 'button is-white is-rounded is-outlined']"
             @click="payWithScatterAsync"
           >
-            Pay in Apps
+            {{$t('tron_app')}}
           </button>
         </div>
       </div>
     </section>
     <footer class="modal-card-foot">
-      <button class="button is-rounded is-white is-outlined" type="button" @click="$parent.close()">Close</button>
+      <button class="button is-rounded is-white is-outlined" type="button" @click="$parent.close()">{{$t('tron_close')}}</button>
     </footer>
   </div>
 </template>
@@ -62,9 +64,9 @@ export default {
       });
       this.$parent.close();
     },
-    async payWithScatterAsync() {
+    payWithScatterAsync() {
       this.isScatterPaying = true;
-      console.log('123')
+      console.log(this.isScatterPaying, 'isScatterPaying')
       try {
         tronApi.contract.buy(this.country.id).send({
           shouldPollResponse: true,
