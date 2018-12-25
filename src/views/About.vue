@@ -11,7 +11,7 @@
           </button>
         </div>
       </div>
-      <h1  v-show="aboutShow">
+      <h1  v-show="aboutShow" class="about-body">
         <div class="content pc-content"
           v-html="$t('ABOUT_CONTENT')">
         </div>
@@ -77,6 +77,9 @@ export default {
 @import "~mapbox-gl/dist/mapbox-gl.css";
 @import "~bulma";
 @import "~buefy/src/scss/buefy";
+
+.about-body
+  overflow-y: scroll;
 
 .country-detail
   position: absolute

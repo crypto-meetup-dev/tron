@@ -64,6 +64,7 @@ export default {
     },
     async payWithScatterAsync() {
       this.isScatterPaying = true;
+      console.log('123')
       try {
         tronApi.contract.buy(this.country.id).send({
           shouldPollResponse: true,
@@ -71,12 +72,11 @@ export default {
         }).then(resp => {
           this.getNowGlobal();
           this.getLangArr();
-          this.$dialog.alert({
-            type: 'is-black',
-            title: this.$t('buy_land_success_alert'),
-            message:
-              this.$t('buy_land_success_msg'),
-            confirmText: this.$t('buy_land_success_comfm'),
+          this.$toast.open({
+            message: this.$t('buy_land_success_alert'),
+            type: 'success',
+            duration: 3000,
+            queue: false,
           });
           this.$parent.close();
           this.isScatterPaying = false;
