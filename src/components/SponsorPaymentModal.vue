@@ -51,33 +51,21 @@ export default {
     ...mapActions(['getLangArr', 'getNowGlobal']),
     payWithScatterAsync() {
       this.isScatterPaying = true;
-      console.log(this.isScatterPaying, this._data.isScatterPaying)
-      // try {
         tronApi.contract.buy(this.country.id).send({
-          shouldPollResponse: true,
+          shouldPollResponse: false,
           callValue: parseInt(this.country._price._hex, 16),
         }).then(resp => {
+          this.$toast.open({
+            message: this.$t('buy_land_withApp_success'),
+            type: 'is-success',
+            duration: 3000,
+            queue: false,
+          });
           this.getNowGlobal();
           this.getLangArr();
           this.$parent.close();
           this.isScatterPaying = false;
         })
-      // } catch (error) {
-      //   let msg;
-      //   if (error.message === undefined) {
-      //     msg = JSON.parse(error).error.details[0].message;
-      //   } else {
-      //     msg = error.message;
-      //   }
-      //   this.$toast.open({
-      //     message: `Transfer failed: ${msg}`,
-      //     type: 'is-danger',
-      //     duration: 3000,
-      //     queue: false,
-      //   });
-      // }
-      // this.isScatterPaying = false;
-      // return null;
     },
   },
 };
